@@ -40,7 +40,7 @@ def main():
             }],
     )
 
-    if chat.choices[0].message.tool_calls and chat.choices[0].message.tool_calls[0].name == "Read":
+    if chat.choices[0].message.tool_calls and chat.choices[0].message.tool_calls[0].function.name == "Read":
         arguments = json.loads(chat,choices[0].tool_calls[0].arguments)
         file_path = arguments["file_path"]
         with open(file_path) as f:
