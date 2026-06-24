@@ -40,6 +40,13 @@ def main():
             }],
     )
 
+    if chat.choices[0].tool_calls and chat.choices[0].tool_calls[0].name == "Read":
+        arguments = json.loads(chat,choices[0].tool_calls[0].arguments)
+        file_path = arguments["file_path"]
+        with open(file_path) as f:
+            file_contents = f.read()
+            print(file_contents)
+        
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
 
