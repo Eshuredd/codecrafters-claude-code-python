@@ -13,7 +13,6 @@ def read_tool_call(tool_call):
         file_path = arguments["file_path"]
         with open(file_path) as f:
             file_contents = f.read()
-            print(file_contents)
             return file_contents
 
 
