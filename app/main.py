@@ -78,7 +78,7 @@ def main():
                     }
                     }
                 }
-            }
+            },
             {
                 "type": "function",
                 "function": {
