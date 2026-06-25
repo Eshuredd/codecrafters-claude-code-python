@@ -23,6 +23,11 @@ def write_tool_call(tool_call):
         f.write(content)
         return f"Successfully wrote to {file_path}"
 
+def bash_tool_call(tool_call):
+    arguments = json.loads(tool_call.function.arguments)
+    command = arguments["command"]
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result
 
 def main():
     p = argparse.ArgumentParser()
@@ -73,6 +78,23 @@ def main():
                     }
                     }
                 }
+            }
+            {
+                "type": "function",
+                "function": {
+                    "name": "Bash",
+                    "description": "Execute a shell command",
+                    "parameters": {
+                    "type": "object",
+                    "required": ["command"],
+                    "properties": {
+                        "command": {
+                        "type": "string",
+                        "description": "The command to execute"
+                        }
+                    }
+                    }
+                }
             },]
     while True:
         
@@ -98,6 +120,10 @@ def main():
             elif tool_call.function.name == "Write":
                 Write_Val = write_tool_call(tool_call)
                 message.append({"role": "tool","tool_call_id": tool_call.id, "content": Write_Val})
+            
+            elif tool_call.function.name == "Bash":
+                bash_out = bash_tool_call(tool_call)
+                message.append({"role": "tool","tool_call_id": tool_call.id, "content": bash_out.stdout})
             else :
                 return None
 
