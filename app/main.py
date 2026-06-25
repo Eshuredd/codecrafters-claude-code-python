@@ -41,11 +41,17 @@ def main():
             }],
     )
 
+
+    if chat.choices[0].message.tool_calls and chat.choices[0].message.tool_calls[0].function.name == "Read":
+        read_tool_call(chat)
+        
+
+
     # TODO: Uncomment the following line to pass the first stage
     if chat.choices[0].message.content:
         print(chat.choices[0].message.content)
 
-    if chat.choices[0].message.tool_calls and chat.choices[0].message.tool_calls[0].function.name == "Read":
+def read_tool_call(chat):
         arguments = json.loads(chat.choices[0].message.tool_calls[0].function.arguments)
         file_path = arguments["file_path"]
         with open(file_path) as f:
