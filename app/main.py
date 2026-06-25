@@ -15,6 +15,14 @@ def read_tool_call(tool_call):
             file_contents = f.read()
             return file_contents
 
+def write_tool_call(tool_call):
+    arguments = json.loads(tool_call.function.arguments)
+    file_path = arguments["file_path"]
+    content = arguments["content"]
+    with open(file_path, "a") as f:
+        f.write(content)
+        return f"Successfully wrote to {file_path}"
+
 
 def main():
     p = argparse.ArgumentParser()
@@ -27,12 +35,8 @@ def main():
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     message = [{"role": "user", "content": args.p}]
-    while True:
-        
-        chat = client.chat.completions.create(
-            model="anthropic/claude-haiku-4.5",
-            messages=message,
-            tools=[{
+    tools = [
+            {
                 "type": "function",
                 "function": {
                     "name": "Read",
@@ -48,7 +52,34 @@ def main():
                     "required": ["file_path"]
                     }
                 }
-                }],
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "Write",
+                    "description": "Write content to a file",
+                    "parameters": {
+                    "type": "object",
+                    "required": ["file_path", "content"],
+                    "properties": {
+                        "file_path": {
+                        "type": "string",
+                        "description": "The path of the file to write to"
+                        },
+                        "content": {
+                        "type": "string",
+                        "description": "The content to write to the file"
+                        }
+                    }
+                    }
+                }
+            },]
+    while True:
+        
+        chat = client.chat.completions.create(
+            model="anthropic/claude-haiku-4.5",
+            messages=message,
+            tools=tools,
         )
 
         assistant_message = chat.choices[0].message
@@ -63,7 +94,10 @@ def main():
             if tool_call.function.name == "Read":
                 Read_Val = read_tool_call(tool_call)
                 message.append({"role": "tool","tool_call_id": tool_call.id, "content": Read_Val})
-
+            
+            if tool_call.function.name == "Write":
+                Write_Val = write_tool_call(tool_call)
+                message.append({"role": "tool","tool_call_id": tool_call.id, "content": Write_Val})
             else :
                 return None
 
