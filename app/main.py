@@ -19,7 +19,7 @@ def write_tool_call(tool_call):
     arguments = json.loads(tool_call.function.arguments)
     file_path = arguments["file_path"]
     content = arguments["content"]
-    with open(file_path, "a") as f:
+    with open(file_path, "w") as f:
         f.write(content)
         return f"Successfully wrote to {file_path}"
 
@@ -95,7 +95,7 @@ def main():
                 Read_Val = read_tool_call(tool_call)
                 message.append({"role": "tool","tool_call_id": tool_call.id, "content": Read_Val})
             
-            if tool_call.function.name == "Write":
+            elif tool_call.function.name == "Write":
                 Write_Val = write_tool_call(tool_call)
                 message.append({"role": "tool","tool_call_id": tool_call.id, "content": Write_Val})
             else :
